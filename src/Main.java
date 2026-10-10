@@ -3,46 +3,51 @@ import java.sql.*;
 void main()
 {
     final String SQL_URL = "jdbc:sqlite:Test_SQL.db";
-    String sqlInsert = "";
-
-    ArrayList<Profile> listOfUsers = new ArrayList<>();
 
     try (Connection connection = DriverManager.getConnection(SQL_URL)) {
         Statement statement = connection.createStatement();
 
-        String sqlSelect = """
-                SELECT id, name, login, password
-                FROM users;
-                """;
-        try (ResultSet resultSet = statement.executeQuery(sqlSelect)) {
-            while (resultSet.next()) {
-                Profile user = new Profile();
-                user.setId(resultSet.getInt("id"));
-                user.setName(resultSet.getString("name"));
-                user.setLogin(resultSet.getString("login"));
-                user.setPassword(resultSet.getString("password"));
-                listOfUsers.add(user);
-
-            }
-        }
         Scanner scanner = new Scanner(System.in);
         String userName = scanner.nextLine();
         String userLogin = scanner.nextLine();
         String userPassword = scanner.nextLine();
 
         Profile userProfile = new Profile(userName, userLogin, userPassword);
-        boolean flag = true;
-        for (Profile existingUser : listOfUsers)
+
+        String sqlExists = "SELECT EXISTS (SELECT 1 FROM users WHERE login = ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlExists))
         {
-            if ((Objects.equals(existingUser.getLogin(), userProfile.getLogin())) & (Objects.equals(existingUser.getName(), userProfile.getName())) & (Objects.equals(existingUser.getPassword(), userProfile.getPassword()))) {
-                System.out.println("Вы вошли в аккаунт)))");
-                flag = false;
-                break;
+            //preparedStatement.setString(1, userName);
+            preparedStatement.setString(1, userLogin);
+            //preparedStatement.setString(3, userPassword);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery())
+            {
+                if (resultSet.next())
+                {
+                    boolean exists = resultSet.getBoolean(1);
+                    if (!exists)
+                    {
+                        String sqlInsert = "INSERT INTO users (name, login, password) VALUES (?, ?, ?)";
+
+                        try (PreparedStatement preparedStatement1 = connection.prepareStatement(sqlInsert))
+                        {
+                            preparedStatement1.setString(1, userName);
+                            preparedStatement1.setString(2, userLogin);
+                            preparedStatement1.setString(3, userPassword);
+
+                            preparedStatement1.executeUpdate();
+
+                            System.out.println("Добавлен пользователь" + userProfile);
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Пользователь существует");
+                    }
+                }
             }
-        }
-        if (flag)
-        {
-            System.out.println("Неверное имя пользователя или пароль или логин");
         }
 
     } catch (SQLException e) {
