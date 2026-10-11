@@ -1,10 +1,26 @@
-import java.sql.*;
-
 void main()
 {
-    final String SQL_URL = "jdbc:sqlite:Test_SQL.db";
+    final String SQL_URL = "jdbc:sqlite:Test_SQL.db?busy_timeout=5000";
+    UserRepository userRepository = new UserRepository(SQL_URL);
+    UserService userService = new UserService(userRepository);
 
-    try (Connection connection = DriverManager.getConnection(SQL_URL)) {
+    Scanner scanner = new Scanner(System.in);
+    String userName = scanner.nextLine();
+    String userLogin = scanner.nextLine();
+    String userPassword = scanner.nextLine();
+
+    Profile userProfile = new Profile(userName, userLogin, userPassword);
+
+    if (userService.initiateRegister(userProfile))
+    {
+        System.out.println("Все четко" + userProfile);
+    }
+    else
+    {
+        System.out.println("Не прошло");
+    }
+
+    /*try (Connection connection = DriverManager.getConnection(SQL_URL)) {
         Statement statement = connection.createStatement();
 
         Scanner scanner = new Scanner(System.in);
@@ -54,6 +70,8 @@ void main()
         System.out.println(e.getMessage());
         throw new RuntimeException(e);
     }
+
+     */
 
     /*
     Profile user = new Profile();
