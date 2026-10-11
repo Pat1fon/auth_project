@@ -9,7 +9,6 @@ public class UserService
 
     public boolean initiateRegister(Profile userProfile)
     {
-
         if (!(userRepository.checkIfExists(userProfile.getLogin())))
         {
             userRepository.insertUser(userProfile);
@@ -17,5 +16,15 @@ public class UserService
         }
         System.out.println("Пользователь существует");
         return false;
+    }
+
+    public Profile initiateLogin(Profile userProfile)
+    {
+        Profile result = userRepository.loginUser(userProfile.getLogin(), userProfile.getPassword());
+        if (result != null)
+        {
+            return result;
+        }
+        return null;
     }
 }

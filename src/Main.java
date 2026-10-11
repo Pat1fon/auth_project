@@ -11,6 +11,25 @@ void main()
 
     Profile userProfile = new Profile(userName, userLogin, userPassword);
 
+    Profile loginUser = userService.initiateLogin(userProfile);
+    if (loginUser != null)
+    {
+        System.out.println("Успешно вошли" + loginUser);
+    }
+    else {
+        System.out.println("Что то пошло не так");
+    }
+    /*
+    UserRepository userRepository = new UserRepository(SQL_URL);
+    UserService userService = new UserService(userRepository);
+
+    Scanner scanner = new Scanner(System.in);
+    String userName = scanner.nextLine();
+    String userLogin = scanner.nextLine();
+    String userPassword = scanner.nextLine();
+
+    Profile userProfile = new Profile(userName, userLogin, userPassword);
+
     if (userService.initiateRegister(userProfile))
     {
         System.out.println("Все четко" + userProfile);
@@ -19,6 +38,8 @@ void main()
     {
         System.out.println("Не прошло");
     }
+
+     */
 
     /*try (Connection connection = DriverManager.getConnection(SQL_URL)) {
         Statement statement = connection.createStatement();
